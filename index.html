@@ -129,11 +129,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         (function() {
-            // ==================== Supabase 配置 ====================
+            // ==================== 配置 ====================
             const SUPABASE_URL = "https://cvcqbhoedlmwoarvkcix.supabase.co";
             const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2Y3FiaG9lZGxtd29hcnZrY2l4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNDI5MTIsImV4cCI6MjA5NDcxODkxMn0.KkkNdMUPNNBvvlGyZN_fq7kp-zIQIqv165mAwOLXzxc";
             
-            // ==================== Supabase Edge Function URL ====================
+            // Supabase Edge Function URL
             const EDGE_FUNCTION_URL = "https://cvcqbhoedlmwoarvkcix.functions.supabase.co/deepseek-chat";
             
             const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -302,7 +302,7 @@
                 return { should: false };
             }
             
-            // ==================== AI对话（通过 Supabase Edge Function） ====================
+            // ==================== AI对话（调用 Supabase Edge Function） ====================
             async function chatWithAI(message, memories) {
                 let memoryText = "";
                 if (memories.user_info.name) memoryText += `用户叫${memories.user_info.name}。`;
@@ -326,11 +326,13 @@
                         })
                     });
                     
+                    const data = await response.json();
+                    
                     if (!response.ok) {
-                        throw new Error('请求失败: ' + response.status);
+                        console.error('Edge Function 错误:', data);
+                        throw new Error(data.error || '请求失败');
                     }
                     
-                    const data = await response.json();
                     return data.reply;
                     
                 } catch (error) {
